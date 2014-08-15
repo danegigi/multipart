@@ -9,6 +9,15 @@ var saveTo = require('save-to')
 var slice = [].slice
 var tmp = os.tmpdir()
 
+var rand = function(){
+  var choice = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var rand = "";
+  for(var i=0; i < 16; i++){
+    rand += choice.charAt(Math.floor(Math.random() * choice.length));
+  }
+  return rand;
+}
+
 module.exports = function* (req, options) {
   // KOA MAGIC SAUCE
   req = req.req || req
@@ -43,7 +52,9 @@ module.exports = function* (req, options) {
       continue
     yield* ch.drain()
     // it's a stream now
-    part.path = path.join(folder, part.filename)
+    // generate filename if no filename found
+    var filename = part.filename || rand();
+    part.path = path.join(folder, filename);
     saveTo(part, part.path, ch.push())
   }
 
